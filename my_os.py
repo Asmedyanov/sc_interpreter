@@ -25,10 +25,13 @@ def open_csv(file_name):
     current and voltage divider
     :param file_name: file name
     :return:
+    dictionary of original values [V]
     {
-        'time': current_time,
-        'current': current_amp,
-        'voltage': voltage
+        'time': Rogowski time [us],
+        'Rogowski': Rogowski signal,
+        'Trig_out': XXRapid camera trig-out signal,
+        'Systron': Systron generator trig signal,
+        'Tektronix': Tektronix voltage divider signal,
     }
     in original units
     """
@@ -56,26 +59,28 @@ def open_csv(file_name):
 
 def open_folder():
     """
-    The function loads the data of experiment from file dialog
+    The function loads the data of SC experiment from file dialog;
     the experiment folder includes:
-    'info.xlsx' file with scalar data of experiment
-    'shot*.csv' file with waveforms
-    'before.rtv' bin file with images from xrapid came
+    '*_info.xlsx' file with scalar data of experiment;
+    'SC*DDMMYY.csv' file with waveforms;
     :return:
-    dict of data
+    dictionary:
+    {
+    'waveforms': dictionary of the original waveforms data,
+    'info':dataframe of SC experiment
+    }
     """
     folder_name = filedialog.askdirectory(
         initialdir='./example')
-    current_dir = os.curdir
     os.chdir(folder_name)
     os.makedirs('Report', exist_ok=True)
     files_data = dict()
-    for fname in os.listdir():
-        if (fname.split('.')[-1] == 'csv') & (fname[0] == 'S'):
-            files_data['waveform'] = open_csv(fname)
+    for file_name in os.listdir():
+        if (file_name.split('.')[-1] == 'csv') & (file_name[0] == 'S'):
+            files_data['waveform'] = open_csv(file_name)
             continue
-        if fname.split('.')[-1] == 'xlsx':
-            files_data['info'] = open_xlsx(fname)
+        if file_name.split('.')[-1] == 'xlsx':
+            files_data['info'] = open_xlsx(file_name)
             continue
     pass
     return files_data
