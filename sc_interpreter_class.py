@@ -43,7 +43,10 @@ class sc_interpreter_class:
         Tektronix_sheet.from_df(self.df_Tektronix)
 
         # waveform_graph = op.new_graph(template='Waveform_butterfly', lname='Waveform')
-        waveform_graph = op.new_graph(template='4Ys_YY-YY', lname='Waveform')
+        try:
+            waveform_graph = op.new_graph(template='SC_interpreter', lname='Waveform')
+        except:
+            waveform_graph = op.new_graph(template='4Ys_YY-YY', lname='Waveform')
         waveform_graph[0].add_plot(current_sheet, coly=2, colx=0, type='line')
         waveform_graph[0].set_xlim(begin=0, end=self.df_Current['us'].max())
         waveform_graph[0].set_ylim(begin=-np.abs(self.df_Current['kA']).max(), end=np.abs(self.df_Current['kA']).max())
@@ -97,8 +100,8 @@ class sc_interpreter_class:
         pic_volt = self.df_Current['V'].values[pic_index]
         noise_ind = np.argwhere(self.df_Current['us'].values < 0)
         noise = self.df_Current['V'].values[noise_ind].max()
-        current_start_ind = np.argwhere(np.abs(self.df_Current['V'].values) > noise).min()
-        self.current_start_time = self.df_Current['us'].values[current_start_ind]
+        current_start_ind = np.argwhere(np.abs(self.df_Current['V'].loc[self.df_Current['us'].values > 0].values) > noise).min()
+        self.current_start_time = self.df_Current['us'].loc[self.df_Current['us'].values > 0].values[current_start_ind]
         current_start_volt = self.df_Current['V'].values[current_start_ind]
 
         def my_exp(x, a, b):
